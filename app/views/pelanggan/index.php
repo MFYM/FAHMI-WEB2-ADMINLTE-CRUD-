@@ -81,7 +81,7 @@
                 <form id="formPelanggan" action="<?= BASEURL; ?>/pelanggan/tambah" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="id_pelanggan">ID Pelanggan</label>
-                        <input type="text" class="form-control" id="id_pelanggan" name="id_pelanggan" placeholder="Masukkan ID Pelanggan" required readonly>
+                        <input type="text" class="form-control" id="id_pelanggan" name="id_pelanggan" placeholder="Masukkan ID Pelanggan" required>
                     </div>
                     <div class="form-group">
                         <label for="nama_pelanggan">Nama Pelanggan</label>
