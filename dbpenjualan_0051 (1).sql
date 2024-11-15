@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2024 at 02:33 PM
+-- Generation Time: Nov 15, 2024 at 02:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,59 @@ SET time_zone = "+00:00";
 --
 -- Database: `dbpenjualan_0051`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertTransaksi` (IN `p_kode_barang` VARCHAR(25), IN `p_id_pelanggan` VARCHAR(25), IN `p_jumlah` INT)   BEGIN
+    DECLARE v_total_harga DECIMAL(15,2);
+    DECLARE v_harga DECIMAL(10,2);
+    
+    
+    SELECT harga INTO v_harga FROM produk WHERE kode_barang = p_kode_barang;
+    
+    
+    SET v_total_harga = v_harga * p_jumlah;
+    
+    
+    INSERT INTO transaksi (kode_barang, id_pelanggan, jumlah, total_harga)
+    VALUES (p_kode_barang, p_id_pelanggan, p_jumlah, v_total_harga);
+    
+    
+    SET @last_id = LAST_INSERT_ID();
+    
+    
+    INSERT INTO items (id_transaksi, kode_barang, nama_barang, jumlah, harga, total_harga)
+    VALUES (@last_id, p_kode_barang, (SELECT nama_barang FROM produk WHERE kode_barang = p_kode_barang), p_jumlah, v_harga, v_total_harga);
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `items`
+--
+
+CREATE TABLE `items` (
+  `id_item` int(11) NOT NULL,
+  `id_transaksi` int(11) NOT NULL,
+  `kode_barang` varchar(25) NOT NULL,
+  `nama_barang` varchar(100) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `harga` decimal(10,2) NOT NULL,
+  `total_harga` decimal(15,2) NOT NULL,
+  `deskripsi` text NOT NULL,
+  `tanggal` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `items`
+--
+
+INSERT INTO `items` (`id_item`, `id_transaksi`, `kode_barang`, `nama_barang`, `jumlah`, `harga`, `total_harga`, `deskripsi`, `tanggal`) VALUES
+(1, 16, 'A0054', 'ANGGUR MERAH', 20, 90000.00, 1800000.00, '', '2024-11-15 20:05:02');
 
 -- --------------------------------------------------------
 
@@ -38,12 +91,7 @@ CREATE TABLE `pelanggan` (
 --
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `nama_pelanggan`, `alamat`) VALUES
-('P-0034', 'Salman', 'Kergon'),
-('P-0043', 'YADI', 'PONCOL'),
-('P-005', 'POAK', 'Medono, Kota Pekalongan'),
-('P-006', 'Fahmi Yusuf', 'Jl Urip Sumoharjo no 100'),
-('P005', 'Heru', 'Kajen'),
-('P009', 'Yusril', 'Kebulen');
+('P-001', 'Fahmi Yusuf', 'Medono Central no.100');
 
 -- --------------------------------------------------------
 
@@ -68,8 +116,8 @@ INSERT INTO `produk` (`foto_barang`, `kode_barang`, `nama_barang`, `harga`, `sto
 ('672aef9b7da98_sale_daster_vneck.jpg', 'A-002', 'DASTERR', 135000.00, 18, 'Daster nyaman dipakai'),
 ('6728a6a40d622_WhatsApp Image 2024-11-03 at 03.24.23_41bd66a2.jpg', 'A001', 'Batik V-Neck', 125000.00, 100, 'Lebar dada 70'),
 ('67348d29cb549_Daster Kekinian 3.jpg', 'A0039', 'ROKOK SIGNATURE', 25000.00, 40, 'ROKOK COWO PEKERJA KERAS'),
-('67348c3be1596_Daster Kekinian 5.jpeg', 'A0054', 'ANGGUR MERAH', 90000.00, 34, 'ANGGUR SEHAT'),
-('67348c1054165_Daster Kekinian 4.jpeg', 'A0055', 'KAWA - KAWA', 900000.00, 49, 'ENAK'),
+('67348c3be1596_Daster Kekinian 5.jpeg', 'A0054', 'ANGGUR MERAH', 90000.00, 14, 'ANGGUR SEHAT'),
+('67348c1054165_Daster Kekinian 4.jpeg', 'A0055', 'KAWA - KAWA', 900000.00, 46, 'ENAK'),
 ('67348d515acaf_Daster Kekinian 2.jpeg', 'A0066', 'ROKOK LA ICE', 38000.00, 20, 'ROKOK CEWE SOLEHOT'),
 ('67348c9fe76df_WhatsApp Image 2024-11-03 at 03.24.35_e61e6590.jpg', 'A0076', 'ROKOK SURYA 16', 38000.00, 33, 'ROKOK COWO GANTENG'),
 ('67348cc63aff0_batik ciri khas.jpg', 'A0088', 'ROKOK SAMPOERNA MILD', 39000.00, 55, 'ROKOK BOS BATIK'),
@@ -97,15 +145,18 @@ CREATE TABLE `transaksi` (
 --
 
 INSERT INTO `transaksi` (`id_transaksi`, `kode_barang`, `id_pelanggan`, `jumlah`, `total_harga`, `tanggal`) VALUES
-(9, 'A001', 'P-005', 1, 125000.00, '2024-11-06 10:58:51'),
-(10, 'A-002', 'P-006', 12, 1620000.00, '2024-11-06 11:25:53'),
-(11, 'A0089', 'P005', 12, 3000000.00, '2024-11-12 17:29:07'),
-(12, 'A0089', 'P009', 3, 750000.00, '2024-11-13 17:06:37'),
-(13, 'A0097', 'P-0034', 3, 285000.00, '2024-11-13 20:19:50');
+(16, 'A0054', 'P-001', 20, 1800000.00, '2024-11-15 19:38:42');
 
 --
 -- Triggers `transaksi`
 --
+DELIMITER $$
+CREATE TRIGGER `after_insert_transaksi` AFTER INSERT ON `transaksi` FOR EACH ROW BEGIN
+    INSERT INTO items (id_transaksi, kode_barang, nama_barang, jumlah, harga, total_harga)
+    VALUES (NEW.id_transaksi, NEW.kode_barang, (SELECT nama_barang FROM produk WHERE kode_barang = NEW.kode_barang), NEW.jumlah, (SELECT harga FROM produk WHERE kode_barang = NEW.kode_barang), NEW.total_harga);
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `stok_keluar` AFTER INSERT ON `transaksi` FOR EACH ROW BEGIN
 	UPDATE produk set stok = stok - NEW.jumlah
@@ -137,8 +188,9 @@ CREATE TABLE `view_detail_transaksi` (
 ,`nama_barang` varchar(100)
 ,`id_pelanggan` varchar(25)
 ,`nama_pelanggan` varchar(50)
+,`alamat` text
 ,`jumlah` int(11)
-,`total_harga` decimal(15,2)
+,`total_harga` decimal(20,2)
 ,`tanggal` datetime
 );
 
@@ -164,7 +216,7 @@ CREATE TABLE `view_transaksi` (
 --
 DROP TABLE IF EXISTS `view_detail_transaksi`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_detail_transaksi`  AS SELECT `t`.`id_transaksi` AS `id_transaksi`, `t`.`kode_barang` AS `kode_barang`, `b`.`nama_barang` AS `nama_barang`, `t`.`id_pelanggan` AS `id_pelanggan`, `p`.`nama_pelanggan` AS `nama_pelanggan`, `t`.`jumlah` AS `jumlah`, `t`.`total_harga` AS `total_harga`, `t`.`tanggal` AS `tanggal` FROM ((`transaksi` `t` join `pelanggan` `p` on(`t`.`id_pelanggan` = `p`.`id_pelanggan`)) join `produk` `b` on(`t`.`kode_barang` = `b`.`kode_barang`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_detail_transaksi`  AS SELECT `t`.`id_transaksi` AS `id_transaksi`, `p`.`kode_barang` AS `kode_barang`, `p`.`nama_barang` AS `nama_barang`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`nama_pelanggan` AS `nama_pelanggan`, `c`.`alamat` AS `alamat`, `t`.`jumlah` AS `jumlah`, `t`.`jumlah`* `p`.`harga` AS `total_harga`, `t`.`tanggal` AS `tanggal` FROM ((`transaksi` `t` join `produk` `p` on(`t`.`kode_barang` = `p`.`kode_barang`)) join `pelanggan` `c` on(`t`.`id_pelanggan` = `c`.`id_pelanggan`)) ;
 
 -- --------------------------------------------------------
 
@@ -178,6 +230,14 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `items`
+--
+ALTER TABLE `items`
+  ADD PRIMARY KEY (`id_item`),
+  ADD KEY `id_transaksi` (`id_transaksi`),
+  ADD KEY `kode_barang` (`kode_barang`);
 
 --
 -- Indexes for table `pelanggan`
@@ -204,14 +264,27 @@ ALTER TABLE `transaksi`
 --
 
 --
+-- AUTO_INCREMENT for table `items`
+--
+ALTER TABLE `items`
+  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `items`
+--
+ALTER TABLE `items`
+  ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`id_transaksi`) REFERENCES `transaksi` (`id_transaksi`),
+  ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`kode_barang`) REFERENCES `produk` (`kode_barang`);
 
 --
 -- Constraints for table `transaksi`
