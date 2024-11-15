@@ -25,9 +25,17 @@ class Transaksi extends Controller{
 
     public function detail($id_transaksi){
         $data['judul'] = 'Detail Transaksi';
+        
+        // Ambil data transaksi
         $data['transaksi'] = $this->model('Transaksi_model')->getTransaksiById($id_transaksi);
+        
+        // Ambil data item berdasarkan ID transaksi
+        $data['items'] = $this->model('Transaksi_model')->getItemsByTransaksiId($id_transaksi);
+        
+        
+        // Tampilkan view
         $this->view("templates/header", $data);
-        $this->view('transaksi/detail',$data);
+        $this->view('transaksi/detail', $data);
         $this->view('templates/footer');
     }
 }

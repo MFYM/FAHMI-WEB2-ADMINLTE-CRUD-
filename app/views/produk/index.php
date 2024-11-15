@@ -41,7 +41,18 @@
                     <td><?= htmlspecialchars($produk['harga']); ?></td>
                     <td><?= htmlspecialchars($produk['stok']); ?></td>
                     <td>
-                        <a href="<?= BASEURL; ?>/produk/detail/<?= $produk['kode_barang']; ?>" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> Detail</a>
+                    <button class="btn btn-primary btn-sm btn-detail" 
+                        data-toggle="modal" 
+                        data-target="#modal-detail" 
+                        data-kode_barang="<?= $produk['kode_barang']; ?>" 
+                        data-nama_barang="<?= htmlspecialchars($produk['nama_barang']); ?>" 
+                        data-harga="<?= htmlspecialchars($produk['harga']); ?>" 
+                        data-stok="<?= htmlspecialchars($produk['stok']); ?>" 
+                        data-deskripsi="<?= htmlspecialchars($produk['deskripsi']); ?>" 
+                        data-foto_barang="<?= BASEURL; ?>/uploads/<?= htmlspecialchars($produk['foto_barang']); ?>">
+                        <i class="fas fa-eye"></i> Detail
+                    </button>
+
                         <button class="btn btn-info btn-sm editProdukButton" data-toggle="modal" data-target="#modal-secondary"
                                 data-kode_barang="<?= $produk['kode_barang']; ?>"
                                 data-nama_barang="<?= htmlspecialchars($produk['nama_barang']); ?>"
@@ -69,6 +80,7 @@
     </nav>
 </div>
 </div>
+<!-- Tambah dan Edit -->
 <div class="modal fade" id="modal-secondary">
     <div class="modal-dialog">
         <div class="modal-content bg-secondary">
@@ -120,46 +132,123 @@
         </div>
     </div>
 </div>
+<!-- Detail -->
+<div class="modal fade" id="modal-detail">
+    <div class="modal-dialog">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalDetailTitle">Detail Data Produk</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Foto Produk</label>
+                    <img id="detailFotoBarang" class="img-fluid" src="" alt="Product Image">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kode Produk</label>
+                    <p id="detailKodeBarang" class="form-text"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nama Produk</label>
+                    <p id="detailNamaBarang" class="form-text"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Harga</label>
+                    <p id="detailHarga" class="form-text"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Stok</label>
+                    <p id="detailStok" class="form-text"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi Barang</label>
+                    <p id="detailDeskripsi" class="form-text"></p>
+                </div>
+            </div>
+            
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const modalTitle = document.getElementById('modalTitle');
-        const formProduk = document.getElementById('formProduk');
-        const modalSubmitButton = document.getElementById('modalSubmitButton');
-        const kodeBarangInput = document.getElementById('kode_barang');
-        const namaBarangInput = document.getElementById('nama_barang');
-        const hargaInput = document.getElementById('harga');
-        const stokInput = document.getElementById('stok');
-        const deskripsiInput = document.getElementById('deskripsi');
-        const currentFoto = document.getElementById('currentFoto');
-        
-        document.querySelectorAll('.editProdukButton').forEach(button => {
-            button.addEventListener('click', () => {
-                modalTitle.textContent = 'Edit Data Produk';
-                formProduk.action = `<?= BASEURL; ?>/produk/Edit/${button.getAttribute('data-kode_barang')}`;
-                modalSubmitButton.textContent = 'Update';
+    const modalTitle = document.getElementById('modalTitle');
+    const formProduk = document.getElementById('formProduk');
+    const modalSubmitButton = document.getElementById('modalSubmitButton');
+    const kodeBarangInput = document.getElementById('kode_barang');
+    const namaBarangInput = document.getElementById('nama_barang');
+    const hargaInput = document.getElementById('harga');
+    const stokInput = document.getElementById('stok');
+    const deskripsiInput = document.getElementById('deskripsi');
+    const currentFoto = document.getElementById('currentFoto');
 
-                kodeBarangInput.value = button.getAttribute('data-kode_barang');
-                namaBarangInput.value = button.getAttribute('data-nama_barang');
-                hargaInput.value = button.getAttribute('data-harga');
-                stokInput.value = button.getAttribute('data-stok');
-                deskripsiInput.value = button.getAttribute('data-deskripsi');
-                currentFoto.textContent = `Current file: ${button.getAttribute('data-foto_barang')}`;
-                kodeBarangInput.readOnly = true;
-            });
-        });
+    // Edit Product
+    document.querySelectorAll('.editProdukButton').forEach(button => {
+        button.addEventListener('click', () => {
+            modalTitle.textContent = 'Edit Data Produk';
+            formProduk.action = `<?= BASEURL; ?>/produk/Edit/${button.getAttribute('data-kode_barang')}`;
+            modalSubmitButton.textContent = 'Update';
 
-        document.getElementById('tambahProdukButton').addEventListener('click', () => {
-            modalTitle.textContent = 'Tambah Data Produk';
-            formProduk.action = `<?= BASEURL; ?>/produk/Tambah`;
-            modalSubmitButton.textContent = 'Tambah';
-
-            kodeBarangInput.value = '';
-            namaBarangInput.value = '';
-            hargaInput.value = '';
-            stokInput.value = '';
-            deskripsiInput.value = '';
-            currentFoto.textContent = '';
-            kodeBarangInput.readOnly = false;
+            kodeBarangInput.value = button.getAttribute('data-kode_barang');
+            namaBarangInput.value = button.getAttribute('data-nama_barang');
+            hargaInput.value = button.getAttribute('data-harga');
+            stokInput.value = button.getAttribute('data-stok');
+            deskripsiInput.value = button.getAttribute('data-deskripsi');
+            currentFoto.textContent = `Current file: ${button.getAttribute('data-foto_barang')}`;
+            kodeBarangInput.readOnly = true;
         });
     });
+
+    // Add Product
+    document.getElementById('tambahProdukButton').addEventListener('click', () => {
+        modalTitle.textContent = 'Tambah Data Produk';
+        formProduk.action = `<?= BASEURL; ?>/produk/Tambah`;
+        modalSubmitButton.textContent = 'Tambah';
+
+        kodeBarangInput.value = '';
+        namaBarangInput.value = '';
+        hargaInput.value = '';
+        stokInput.value = '';
+        deskripsiInput.value = '';
+        currentFoto.textContent = '';
+        kodeBarangInput.readOnly = false;
+    });
+
+    // View Product Detail
+    document.querySelectorAll('.btn-detail').forEach(button => {
+    button.addEventListener('click', () => {
+        // Ambil data dari tombol
+        const imageUrl = button.getAttribute('data-foto_barang');
+        const kodeBarang = button.getAttribute('data-kode_barang');
+        const namaBarang = button.getAttribute('data-nama_barang');
+        const harga = button.getAttribute('data-harga');
+        const stok = button.getAttribute('data-stok');
+        const deskripsi = button.getAttribute('data-deskripsi');
+
+        // Atur data ke elemen modal
+        document.getElementById('detailKodeBarang').textContent = kodeBarang;
+        document.getElementById('detailNamaBarang').textContent = namaBarang;
+        document.getElementById('detailHarga').textContent = `Rp ${harga}`;
+        document.getElementById('detailStok').textContent = stok;
+        document.getElementById('detailDeskripsi').textContent = deskripsi;
+
+        // Atur gambar produk di modal
+        const imgElement = document.getElementById('detailFotoBarang');
+        imgElement.src = imageUrl || "<?= BASEURL; ?>/uploads/default_image.jpg"; // Gambar default jika tidak ada
+    });
+});
+
+
+
+});
+
+
 </script>

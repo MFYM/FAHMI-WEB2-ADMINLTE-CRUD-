@@ -25,6 +25,13 @@ class Transaksi_model {
         $this->db->bind('id_transaksi', $id_transaksi);
         return $this->db->single();
     }
+    
+    public function getItemsByTransaksiId($id_transaksi) {
+        $this->db->query("SELECT * FROM items WHERE id_transaksi = :id_transaksi");
+        $this->db->bind(':id_transaksi', $id_transaksi);
+        $result = $this->db->resultSet();
+        return $result;
+    }
 
     public function tambahDataTransaksi($data) {
         try {

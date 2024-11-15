@@ -32,15 +32,19 @@
             </thead>
             <tbody>
               <?php $no = 1 + ($data['currentPage'] - 1) * 10; ?>
-                <?php $no = 1  ; ?>
                 <?php foreach ($data['pelanggan'] as $pelanggan) : ?>
                 <tr>
                     <th scope="row"><?= $no++; ?></th>
                     <td><?= htmlspecialchars($pelanggan['nama_pelanggan']); ?></td>
                     <td><?= htmlspecialchars($pelanggan['alamat']); ?></td>
                     <td>
-                        <a href="<?= BASEURL; ?>/pelanggan/detail/<?= $pelanggan['id_pelanggan']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye">
-                        </i> Detail</a>
+                        <button type="button" class="btn btn-info btn-sm detailPelangganButton" data-toggle="modal" data-target="#detail" 
+                            data-id_pelanggan="<?= $pelanggan['id_pelanggan']; ?>"
+                            data-nama_pelanggan="<?= htmlspecialchars($pelanggan['nama_pelanggan']); ?>"
+                            data-alamat="<?= htmlspecialchars($pelanggan['alamat']); ?>">
+                            <i class="fas fa-eye"> Detail</i>
+                        </button>
+
                         <a href="<?= BASEURL; ?>/pelanggan/delete/<?= $pelanggan['id_pelanggan']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data pelanggan ini?')"><i class="fas fa-trash"></i> Delete</a>
                         <button class="btn btn-info btn-sm editPelangganButton" data-toggle="modal" data-target="#modal-secondary"
                                 data-id_pelanggan="<?= $pelanggan['id_pelanggan']; ?>"
@@ -66,6 +70,7 @@
             </ul>
     </nav>
 </div>
+
 </div>
 <div class="modal fade" id="modal-secondary">
     <div class="modal-dialog">
@@ -102,6 +107,40 @@
 </div>
 
 
+<!-- Detail -->
+<div class="modal fade" id="detail">
+    <div class="modal-dialog">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header">
+                <h4 class="modal-title">Detail Pelanggan</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>ID Pelanggan</th>
+                        <td id="modal-id-pelanggan"></td> 
+                    </tr>
+                    <tr>
+                        <th>Nama Pelanggan</th>
+                        <td id="modal-nama-pelanggan"></td> 
+                    </tr>
+                    <tr>
+                        <th>Alamat</th>
+                        <td id="modal-alamat-pelanggan"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+
 <script>
     document.querySelectorAll('.editPelangganButton').forEach(button => {
         button.addEventListener('click', function() {
@@ -121,11 +160,24 @@
     });
 
     // Reset modal for adding new data
-    document.getElementById('tambahPelangganButton').addEventListener('click', function() {
+        document.getElementById('tambahPelangganButton').addEventListener('click', function() {
         document.getElementById('modalTitle').innerText = 'Tambah Data Pelanggan';
         document.getElementById('formPelanggan').action = '<?= BASEURL; ?>/pelanggan/tambah';
         document.getElementById('id_pelanggan').value = '';
         document.getElementById('nama_pelanggan').value = '';
         document.getElementById('alamat').value = '';
     });
+
+    document.querySelectorAll('.detailPelangganButton').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id_pelanggan');
+            const nama = this.getAttribute('data-nama_pelanggan');
+            const alamat = this.getAttribute('data-alamat');
+
+            // Memasukkan data pelanggan ke dalam modal detail
+            document.getElementById('modal-id-pelanggan').textContent = id;
+            document.getElementById('modal-nama-pelanggan').textContent = nama;
+            document.getElementById('modal-alamat-pelanggan').textContent = alamat;
+        });
+    });         
 </script>
