@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 15, 2024 at 02:22 PM
+-- Generation Time: Nov 15, 2024 at 04:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -72,7 +72,7 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`id_item`, `id_transaksi`, `kode_barang`, `nama_barang`, `jumlah`, `harga`, `total_harga`, `deskripsi`, `tanggal`) VALUES
-(1, 16, 'A0054', 'ANGGUR MERAH', 20, 90000.00, 1800000.00, '', '2024-11-15 20:05:02');
+(1, 1, 'A0054', 'ANGGUR MERAH', 10, 90000.00, 900000.00, 'ANGGUR SEHAT', '2024-11-15 22:08:59');
 
 -- --------------------------------------------------------
 
@@ -91,7 +91,7 @@ CREATE TABLE `pelanggan` (
 --
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `nama_pelanggan`, `alamat`) VALUES
-('P-001', 'Fahmi Yusuf', 'Medono Central no.100');
+('P-001', 'Fahmi Yusuf', 'Medono, Kota Pekalongan');
 
 -- --------------------------------------------------------
 
@@ -115,8 +115,9 @@ CREATE TABLE `produk` (
 INSERT INTO `produk` (`foto_barang`, `kode_barang`, `nama_barang`, `harga`, `stok`, `deskripsi`) VALUES
 ('672aef9b7da98_sale_daster_vneck.jpg', 'A-002', 'DASTERR', 135000.00, 18, 'Daster nyaman dipakai'),
 ('6728a6a40d622_WhatsApp Image 2024-11-03 at 03.24.23_41bd66a2.jpg', 'A001', 'Batik V-Neck', 125000.00, 100, 'Lebar dada 70'),
+('67375e277e50c_WhatsApp Image 2024-11-03 at 03.24.22_3624251d.jpg', 'A0022', 'Korek Api ', 5000.00, 0, 'Korek Gas'),
 ('67348d29cb549_Daster Kekinian 3.jpg', 'A0039', 'ROKOK SIGNATURE', 25000.00, 40, 'ROKOK COWO PEKERJA KERAS'),
-('67348c3be1596_Daster Kekinian 5.jpeg', 'A0054', 'ANGGUR MERAH', 90000.00, 14, 'ANGGUR SEHAT'),
+('67348c3be1596_Daster Kekinian 5.jpeg', 'A0054', 'ANGGUR MERAH', 90000.00, 4, 'ANGGUR SEHAT'),
 ('67348c1054165_Daster Kekinian 4.jpeg', 'A0055', 'KAWA - KAWA', 900000.00, 46, 'ENAK'),
 ('67348d515acaf_Daster Kekinian 2.jpeg', 'A0066', 'ROKOK LA ICE', 38000.00, 20, 'ROKOK CEWE SOLEHOT'),
 ('67348c9fe76df_WhatsApp Image 2024-11-03 at 03.24.35_e61e6590.jpg', 'A0076', 'ROKOK SURYA 16', 38000.00, 33, 'ROKOK COWO GANTENG'),
@@ -145,15 +146,23 @@ CREATE TABLE `transaksi` (
 --
 
 INSERT INTO `transaksi` (`id_transaksi`, `kode_barang`, `id_pelanggan`, `jumlah`, `total_harga`, `tanggal`) VALUES
-(16, 'A0054', 'P-001', 20, 1800000.00, '2024-11-15 19:38:42');
+(1, 'A0054', 'P-001', 10, 900000.00, '2024-11-15 22:08:59');
 
 --
 -- Triggers `transaksi`
 --
 DELIMITER $$
 CREATE TRIGGER `after_insert_transaksi` AFTER INSERT ON `transaksi` FOR EACH ROW BEGIN
-    INSERT INTO items (id_transaksi, kode_barang, nama_barang, jumlah, harga, total_harga)
-    VALUES (NEW.id_transaksi, NEW.kode_barang, (SELECT nama_barang FROM produk WHERE kode_barang = NEW.kode_barang), NEW.jumlah, (SELECT harga FROM produk WHERE kode_barang = NEW.kode_barang), NEW.total_harga);
+    INSERT INTO items (id_transaksi, kode_barang, nama_barang, jumlah, harga, total_harga, deskripsi)
+    VALUES (
+        NEW.id_transaksi,
+        NEW.kode_barang,
+        (SELECT nama_barang FROM produk WHERE kode_barang = NEW.kode_barang),
+        NEW.jumlah,
+        (SELECT harga FROM produk WHERE kode_barang = NEW.kode_barang),
+        NEW.total_harga,
+        (SELECT deskripsi FROM produk WHERE kode_barang = NEW.kode_barang)
+    );
 END
 $$
 DELIMITER ;
@@ -236,8 +245,8 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 ALTER TABLE `items`
   ADD PRIMARY KEY (`id_item`),
-  ADD KEY `id_transaksi` (`id_transaksi`),
-  ADD KEY `kode_barang` (`kode_barang`);
+  ADD KEY `kode_barang` (`kode_barang`),
+  ADD KEY `items_ibfk_1` (`id_transaksi`);
 
 --
 -- Indexes for table `pelanggan`
@@ -257,7 +266,7 @@ ALTER TABLE `produk`
 ALTER TABLE `transaksi`
   ADD PRIMARY KEY (`id_transaksi`),
   ADD KEY `kode_barang` (`kode_barang`),
-  ADD KEY `id_pelanggan` (`id_pelanggan`);
+  ADD KEY `transaksi_ibfk_2` (`id_pelanggan`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -273,7 +282,7 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

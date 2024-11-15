@@ -42,7 +42,7 @@
                             data-id_pelanggan="<?= $pelanggan['id_pelanggan']; ?>"
                             data-nama_pelanggan="<?= htmlspecialchars($pelanggan['nama_pelanggan']); ?>"
                             data-alamat="<?= htmlspecialchars($pelanggan['alamat']); ?>">
-                            <i class="fas fa-eye"> Detail</i>
+                            <i class="fas fa-eye"></i> Detail
                         </button>
 
                         <a href="<?= BASEURL; ?>/pelanggan/delete/<?= $pelanggan['id_pelanggan']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data pelanggan ini?')"><i class="fas fa-trash"></i> Delete</a>

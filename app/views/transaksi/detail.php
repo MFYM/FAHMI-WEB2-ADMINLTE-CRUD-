@@ -38,13 +38,13 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
-            <div class="callout callout-info">
+            <div class="callout callout-info no-print">
               <h5><i class="fas fa-info"></i> Note:</h5>
               This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
             </div>
 
             <!-- Main content -->
-            <div class="invoice p-3 mb-3">
+            <div class="invoice p-3 mb-3 printable" id="invoice-content">
               <!-- title row -->
               <div class="row">
                 <div class="col-12">
@@ -94,7 +94,7 @@
                     <tr>
                       <th>Qty</th>
                       <th>Product</th>
-                      <th>Serial #</th>
+                      <th>ID Product</th>
                       <th>Description</th>
                       <th>Subtotal</th>
                     </tr>
@@ -137,7 +137,7 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-6">
-                    <p class="lead">Amount Due <?= isset($data['transaksi']['tanggal']) ? htmlspecialchars($data['transaksi']['tanggal']) : 'Tanggal tidak tersedia'; ?></p>
+                    <p class="lead">Amount Due <?= htmlspecialchars($data['tanggal']); ?></p>
 
                     <div class="table-responsive">
                         <table class="table">
@@ -157,21 +157,35 @@
             <!-- /.row -->
               <!-- this row will not appear when printing -->
               <div class="row no-print">
-                <div class="col-12">
-                  <a href="invoice-print.html" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
-                  <button type="button" class="btn btn-success float-right"><i class="far fa-credit-card"></i> Submit Payment</button>
-                  <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                    <i class="fas fa-download"></i> Generate PDF
-                  </button>
+                    <div class="col-12">
+                        <button rel="noopener" onclick="printInvoice()" class="btn btn-default"><i class="fas fa-print"></i> 
+                            Print
+                        </button>
+                        
+                        <a href="<?= BASEURL; ?>/Transaksi" type="button" class="btn btn-success float-right">
+                            Kembali
+                        </a>
+                        <button type="button" rel="noopener" class="btn btn-primary float-right" onclick="pdf()" style="margin-right: 5px;">
+                                    <i class="fas fa-download"></i> Generate PDF
+                        </button>
+                    </div>
                 </div>
-              </div>
             </div>
-            <!-- /.invoice -->
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+          </div>
+        </div>
+      </div>
     </section>
-    <!-- /.content -->
-  </div>
-  
- 
+</div>
+
+<script>
+    function printInvoice() {
+        window.print();
+    }
+
+    function pdf() {
+        const element = document.getElementById('invoice-content'); // Get the invoice content
+        html2pdf()
+            .from(element)
+            .save('invoice.pdf'); // Specify the name of the PDF file
+    }
+</script>

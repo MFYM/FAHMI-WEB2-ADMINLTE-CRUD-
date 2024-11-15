@@ -38,4 +38,6 @@ class Transaksi extends Controller{
         $this->view('transaksi/detail', $data);
         $this->view('templates/footer');
     }
+
+    
 }
